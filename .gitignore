@@ -1,0 +1,11 @@
+# Power BI e arquivos temporários do Office
+*.tmp
+*.temp
+~$*
+*Zone.Identifier
+
+# Arquivos de sistema operacional
+Thumbs.db
+.DS_Store
+
+# Opcional: caso o arquivo .pbix ultrapasse 100 MB, utilize o Git LFS ou ignore a pasta data pesada

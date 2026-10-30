@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Monitoramento de Queimadas na Paraíba — Mockup do Painel</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --wine:#7A1E1E;
+    --wine-dark:#5C1414;
+    --ember:#D9531E;
+    --gold:#F2A73B;
+    --cream:#FBF6F1;
+    --card:#FFFFFF;
+    --line:#E7DCD4;
+    --ink:#2B2320;
+    --muted:#8A7A70;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+  }
+  .page{ max-width:1500px; margin:0 auto; padding:22px; }
+
+  .header{
+    background:linear-gradient(120deg,var(--wine) 0%,var(--wine-dark) 100%);
+    border-radius:14px;
+    padding:22px 28px;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .header h1{ margin:0; font-size:26px; letter-spacing:0.5px; }
+  .header p{ margin:4px 0 0; opacity:0.85; font-size:13px; }
+  .header .fonte{ text-align:right; font-size:11.5px; opacity:0.85; line-height:1.5; }
+  .flame{ font-size:26px; margin-right:10px; }
+
+  .layout{ display:grid; grid-template-columns: 1fr 230px; gap:16px; }
+
+  .kpi-row{ display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:16px; grid-column: 1 / -1; }
+  .kpi{
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:14px 16px; box-shadow:0 1px 2px rgba(0,0,0,0.03);
+  }
+  .kpi .label{ font-size:11px; text-transform:uppercase; letter-spacing:0.6px; color:var(--muted); font-weight:600;}
+  .kpi .value{ font-size:24px; font-weight:700; color:var(--wine-dark); margin-top:6px; }
+  .kpi .sub{ font-size:12px; color:var(--muted); margin-top:2px;}
+  .kpi .icon{ font-size:18px; }
+
+  .main-col{ display:flex; flex-direction:column; gap:16px; }
+  .row-2{ display:grid; grid-template-columns: 1.15fr 1fr; gap:16px; }
+  .row-3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:16px; }
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:16px 18px; box-shadow:0 1px 2px rgba(0,0,0,0.03);
+  }
+  .card h3{ margin:0 0 2px; font-size:13.5px; color:var(--wine-dark); }
+  .card .desc{ font-size:11px; color:var(--muted); margin-bottom:10px; }
+  .chart-wrap{ position:relative; height:230px; }
+  .chart-wrap.tall{ height:300px; }
+
+  .map-box{
+    height:300px; border-radius:10px; position:relative; overflow:hidden;
+    background:
+      radial-gradient(circle at 30% 40%, rgba(217,83,30,.55) 0 6px, transparent 7px),
+      radial-gradient(circle at 45% 55%, rgba(217,83,30,.45) 0 5px, transparent 6px),
+      radial-gradient(circle at 55% 35%, rgba(242,167,59,.6) 0 4px, transparent 5px),
+      radial-gradient(circle at 65% 60%, rgba(122,30,30,.6) 0 7px, transparent 8px),
+      radial-gradient(circle at 25% 65%, rgba(242,167,59,.5) 0 4px, transparent 5px),
+      radial-gradient(circle at 70% 40%, rgba(217,83,30,.5) 0 5px, transparent 6px),
+      radial-gradient(circle at 38% 25%, rgba(242,167,59,.55) 0 4px, transparent 5px),
+      radial-gradient(circle at 58% 70%, rgba(217,83,30,.45) 0 5px, transparent 6px),
+      linear-gradient(180deg,#FFF9F2,#FDECDC);
+    border:1px dashed var(--line);
+  }
+  .map-legend{
+    position:absolute; bottom:8px; left:10px; background:rgba(255,255,255,0.9);
+    border-radius:8px; padding:6px 10px; font-size:10.5px; display:flex; gap:10px;
+  }
+  .map-legend span{ display:flex; align-items:center; gap:4px; }
+  .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; }
+
+  .filters{
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:16px; height:fit-content; align-self:start;
+  }
+  .filters h3{ margin:0 0 12px; font-size:14px; color:var(--wine-dark); }
+  .filter-group{ margin-bottom:14px; }
+  .filter-group label{ font-size:11px; text-transform:uppercase; color:var(--muted); font-weight:600; letter-spacing:.4px; }
+  .filter-select{
+    margin-top:5px; border:1px solid var(--line); border-radius:8px; padding:8px 10px;
+    font-size:12.5px; color:var(--ink); background:#fff; display:flex; justify-content:space-between; align-items:center;
+  }
+  .note{
+    margin-top:18px; background:#FBEFE3; border:1px dashed var(--gold); border-radius:10px;
+    padding:12px; font-size:11.5px; color:#7a5a24; line-height:1.5;
+  }
+
+  .footer-note{
+    grid-column:1 / -1;
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:14px 18px; font-size:12.5px; color:var(--ink); display:flex; gap:10px; align-items:flex-start;
+    margin-top:16px;
+  }
+  .footer-note .star{ color:var(--gold); font-size:16px; }
+
+  .legend-inline{ display:flex; gap:14px; font-size:11px; color:var(--muted); margin-top:6px; flex-wrap:wrap;}
+  .legend-inline span{ display:flex; align-items:center; gap:4px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div>
+      <h1><span class="flame">🔥</span>Monitoramento de Queimadas na Paraíba</h1>
+      <p>Período analisado: 2021 a 2025 · Painel analítico — protótipo visual</p>
+    </div>
+    <div class="fonte"><u>Fonte</u>: Monitoramento de Queimadas<br>Portal Brasileiro de Dados Abertos</div>
+  </div>
+
+  <div class="layout">
+
+    <div class="kpi-row">
+      <div class="kpi"><div class="label">🔥 Total de focos</div><div class="value">86.420</div><div class="sub">2021 – 2025</div></div>
+      <div class="kpi"><div class="label">📍 Município c/ mais focos</div><div class="value">Patos</div><div class="sub">9.840 focos</div></div>
+      <div class="kpi"><div class="label">📅 Mês c/ mais focos</div><div class="value">Ago</div><div class="sub">15.200 focos</div></div>
+      <div class="kpi"><div class="label">📈 Ano c/ mais focos</div><div class="value">2025</div><div class="sub">20.100 focos</div></div>
+      <div class="kpi"><div class="label">🍃 Bioma c/ mais focos</div><div class="value">Caatinga</div><div class="sub">60% do total</div></div>
+    </div>
+
+    <div class="main-col">
+
+      <div class="row-2">
+        <div class="card">
+          <h3>Distribuição dos focos de queimadas</h3>
+          <div class="desc">Mapa da Paraíba — densidade de ocorrências por região</div>
+          <div class="map-box">
+            <div class="map-legend">
+              <span><i class="dot" style="background:#F2A73B"></i>1–50</span>
+              <span><i class="dot" style="background:#D9531E"></i>51–200</span>
+              <span><i class="dot" style="background:#B8391C"></i>201–500</span>
+              <span><i class="dot" style="background:#7A1E1E"></i>&gt;500</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Evolução dos focos de queimadas</h3>
+          <div class="desc">Total anual (2021 a 2025)</div>
+          <div class="chart-wrap tall"><canvas id="lineChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="row-3">
+        <div class="card">
+          <h3>Focos por município</h3>
+          <div class="desc">Top 10 — total do período</div>
+          <div class="chart-wrap"><canvas id="barMunicipio"></canvas></div>
+        </div>
+        <div class="card">
+          <h3>Focos por mês</h3>
+          <div class="desc">Média 2021–2025 — sazonalidade</div>
+          <div class="chart-wrap"><canvas id="barMes"></canvas></div>
+        </div>
+        <div class="card">
+          <h3>Focos por bioma</h3>
+          <div class="desc">Participação no total</div>
+          <div class="chart-wrap"><canvas id="pieBioma"></canvas></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="filters">
+      <h3>Filtros</h3>
+      <div class="filter-group"><label>Ano</label><div class="filter-select">2021 – 2025 <span>▾</span></div></div>
+      <div class="filter-group"><label>Mês</label><div class="filter-select">Todos <span>▾</span></div></div>
+      <div class="filter-group"><label>Município</label><div class="filter-select">Todos <span>▾</span></div></div>
+      <div class="filter-group"><label>Bioma</label><div class="filter-select">Todos <span>▾</span></div></div>
+      <div class="note">💡 Use os filtros para explorar os focos de queimadas por período, município e bioma.</div>
+    </div>
+
+    <div class="footer-note">
+      <span class="star">★</span>
+      <div><b>Análise:</b> o painel permite acompanhar a evolução anual dos focos de queimadas na Paraíba, identificando os municípios e períodos mais críticos, além da distribuição por bioma — dados de exemplo para referência de layout.</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+Chart.defaults.font.family = "'Segoe UI', Roboto, Arial, sans-serif";
+Chart.defaults.color = "#6b5c53";
+Chart.defaults.plugins.legend.labels.boxWidth = 10;
+
+// Evolução anual
+new Chart(document.getElementById('lineChart'), {
+  type: 'line',
+  data: {
+    labels: ['2021','2022','2023','2024','2025'],
+    datasets: [{
+      label: 'Focos de queimadas',
+      data: [13400, 17800, 11900, 15100, 20100],
+      borderColor: '#B8391C',
+      backgroundColor: 'rgba(184,57,28,0.12)',
+      pointBackgroundColor: '#7A1E1E',
+      tension: 0.35,
+      fill: true,
+      borderWidth: 2.5,
+      pointRadius: 4
+    }]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false} },
+    scales:{ y:{ grid:{color:'#EFE6DE'}, ticks:{callback:v=>(v/1000)+'k'} }, x:{ grid:{display:false} } }
+  }
+});
+
+// Focos por município
+new Chart(document.getElementById('barMunicipio'), {
+  type: 'bar',
+  data: {
+    labels: ['Patos','Sousa','Cajazeiras','Itaporanga','Catingueira','São J. do Rio','Monteiro','Ouro Velho','Coremas','Piancó'],
+    datasets: [{
+      data: [9840,8620,7450,6100,5300,4900,4400,4100,3700,3200],
+      backgroundColor: '#D9531E',
+      borderRadius: 4
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false} },
+    scales:{ x:{ grid:{color:'#EFE6DE'} }, y:{ grid:{display:false}, ticks:{font:{size:10.5}} } }
+  }
+});
+
+// Focos por mês
+new Chart(document.getElementById('barMes'), {
+  type: 'bar',
+  data: {
+    labels: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+    datasets: [{
+      data: [2100,2400,2800,3600,4700,6200,8900,15200,9800,5100,3300,2500],
+      backgroundColor: '#F2A73B',
+      borderRadius: 4
+    }]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false} },
+    scales:{ y:{ grid:{color:'#EFE6DE'}, ticks:{callback:v=>(v/1000)+'k'} }, x:{ grid:{display:false}, ticks:{font:{size:10}} } }
+  }
+});
+
+// Focos por bioma
+new Chart(document.getElementById('pieBioma'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Caatinga','Mata Atlântica','Agricultura','Outros'],
+    datasets: [{
+      data: [60,25,10,5],
+      backgroundColor: ['#7A1E1E','#8FAE6B','#F2A73B','#B79ACF'],
+      borderWidth: 2,
+      borderColor:'#fff'
+    }]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ position:'right', labels:{ font:{size:11} } } }
+  }
+});
+</script>
+</body>
+</html>
