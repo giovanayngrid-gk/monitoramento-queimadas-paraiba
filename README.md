@@ -1,6 +1,6 @@
 # 🔥 Monitoramento de Focos de Queimadas — Estado da Paraíba (2021–2024)
 
-[![Power BI](https://img.shields.io/badge/Power_BI-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)](https://acadcruzeirodosul-my.sharepoint.com/:u:/g/personal/giovana_ribeiro_cs_unipe_edu_br/IQBrMCapNIgHSLIBaq4tbMC8AbQ2Ga9pVakjd3xkxrnxFEo?e=DodPDu)
+[![Power BI](https://img.shields.io/badge/Power_BI-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)](https://app.powerbi.com/groups/me/reports/8b49f3b7-ef1d-4cde-abc4-99e985044ba6/a555352d3f06848d8ba7?experience=power-bi)
 [![Dados Públicos](https://img.shields.io/badge/Dados.gov.br-Monitoramento_de_Queimadas-005CA9?style=for-the-badge)](https://dados.gov.br/dados/conjuntos-dados/monitoramento-de-queimadas)
 [![Status](https://img.shields.io/badge/Status-Concluído-success?style=for-the-badge)]()
 
